@@ -17,13 +17,16 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "serve": "serve -s build",
-    "build-and-serve": "npm run build && npm run serve"
+    "build-and-serve": "npm run build && npm run serve",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest",
-      "plugin:jsx-a11y/recommended"
+      "plugin:jsx-a11y/recommended",
+      "plugin:storybook/recommended"
     ],
     "plugins": [
       "jsx-a11y"
@@ -58,9 +61,24 @@
     ]
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "^7.5.1",
+    "@storybook/addon-interactions": "^7.5.1",
+    "@storybook/addon-links": "^7.5.1",
+    "@storybook/addon-onboarding": "^1.0.8",
+    "@storybook/blocks": "^7.5.1",
+    "@storybook/preset-create-react-app": "^7.5.1",
+    "@storybook/react": "^7.5.1",
+    "@storybook/react-webpack5": "^7.5.1",
+    "@storybook/testing-library": "^0.2.2",
+    "babel-plugin-named-exports-order": "^0.0.2",
+    "chromatic": "^7.5.4",
     "classnames": "^2.3.2",
     "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-storybook": "^0.6.15",
+    "prop-types": "^15.8.1",
     "sass": "^1.69.5",
-    "serve": "^11.3.2"
+    "serve": "^11.3.2",
+    "storybook": "^7.5.1",
+    "webpack": "^5.89.0"
   }
 }
