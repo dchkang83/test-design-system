@@ -1,93 +1,26 @@
-name: "UI Tests"
+# .github/workflows/chromatic.yml
 
+# Workflow name
+name: "Chromatic"
+
+# Event for the workflow
 on: push
 
+# List of jobs
 jobs:
-  # Install and cache npm dependencies
-  install-cache:
+  chromatic-deployment:
+    # Operating System
     runs-on: ubuntu-latest
+    # Job steps
     steps:
-      - name: Checkout Commit
-        uses: actions/checkout@v2
-      - name: Cache yarn dependencies and cypress
-        uses: actions/cache@v2
-        id: yarn-cache
-        with:
-          path: |
-            ~/.cache/Cypress
-            node_modules
-          key: ${{ runner.os }}-yarn-v1-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-v1
-      - name: Install dependencies if cache invalid
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        # 👇 Install dependencies with the same package manager used in the project (replace it as needed), e.g. yarn, npm, pnpm
         run: yarn
-  # Run interaction and accessibility tests
-  interaction-and-accessibility:
-    runs-on: ubuntu-latest
-    needs: install-cache
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "14.x"
-      - name: Restore yarn dependencies
-        uses: actions/cache@v2
-        id: yarn-cache
-        with:
-          path: |
-            ~/.cache/Cypress
-            node_modules
-          key: ${{ runner.os }}-yarn-v1-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-v1
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-      - name: Build Storybook
-        run: yarn build-storybook --quiet
-      - name: Serve Storybook and run tests
-        run: |
-          npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue"            "npx http-server storybook-static --port 6006 --silent"            "npx wait-on tcp:6006 && yarn test-storybook"
-  # Run visual and composition tests with Chromatic
-  visual-and-composition:
-    runs-on: ubuntu-latest
-    needs: install-cache
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # Required to retrieve git history
-      - name: Restore yarn dependencies
-        uses: actions/cache@v2
-        id: yarn-cache
-        with:
-          path: |
-            ~/.cache/Cypress
-            node_modules
-          key: ${{ runner.os }}-yarn-v1-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-v1
+        # 👇 Adds Chromatic as a step in the workflow
       - name: Publish to Chromatic
         uses: chromaui/action@v1
+        # Chromatic GitHub Action options
         with:
-          # Grab this from the Chromatic manage page
+          # 👇 Chromatic projectToken, refer to the manage page to obtain it.
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-  # Run user flow tests with Cypress
-  user-flow:
-    runs-on: ubuntu-latest
-    needs: install-cache
-    steps:
-      - uses: actions/checkout@v2
-      - name: Restore yarn dependencies
-        uses: actions/cache@v2
-        id: yarn-cache
-        with:
-          path: |
-            ~/.cache/Cypress
-            node_modules
-          key: ${{ runner.os }}-yarn-v1-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-v1
-      - name: Cypress run
-        uses: cypress-io/github-action@v2
-        with:
-          start: npm start
